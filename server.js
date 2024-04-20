@@ -1,8 +1,8 @@
 'use strict'
 
+const PORT = 3000;
 const express = require('express');
 const app = express();
-const PORT = 3000;
 const data = require("./MovieData/data.json");
 
 // To connect the server
