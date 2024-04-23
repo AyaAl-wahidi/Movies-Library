@@ -146,6 +146,65 @@ app.get('/getMovies', (req, res) => {
         })
 });
 
+// Rout to edit specific movie bi the id
+app.put('/editMovieById/:id', (req, res) => {
+
+    let editData = req.params.id;
+    let { id, title, overview, release_date, poster_path, comment } = req.body;
+    const sql = 'UPDATE movie SET id = $1, title = $2, overview = $3, release_date = $4, poster_path = $5, comment = $6 WHERE id = $1;'
+    const values = [id, title, overview, release_date, poster_path, comment];
+    client.query(sql, values).then((result) => {
+        if (result.rowCount === 0) {
+            // No row was deleted, send a different response
+            res.status(404).send(`No movie found with id: ${id}`);
+        } else {
+            // A row was deleted, send a success response
+            res.send("Successfully edited");        }
+    })
+        .catch(error => {
+            console.log("An error occurred while deleting the movie.", error);
+        })
+});
+
+// Rout to delete a record data based by id from movies list
+app.delete('/deleteMovieById/:id', (req, res) => {
+
+    let {id} = req.params;
+    const sql = 'DELETE FROM movie WHERE id = $1;'
+    const values = [id];
+    client.query(sql, values).then((result) => {
+        if (result.rowCount === 0) {
+            // No row was deleted, send a different response
+            res.status(404).send(`No movie found with id: ${id}`);
+        } else {
+            // A row was deleted, send a success response
+            res.send(`Successfully deleted the movie with id: ${id}`);
+        }
+    })
+        .catch(error => {
+            console.log("An error occurred while deleting the movie.", error);
+        })
+});
+
+// Rout to get one specific movie based by id
+app.get('/getMovie/:id', (req, res) => {
+
+    let { id } = req.params;
+    const sql = 'SELECT * FROM movie WHERE id = $1;'
+    const values = [id];
+    client.query(sql, values).then((result) => {
+        if (result.rowCount === 0) {
+            // No row was deleted, send a different response
+            res.status(404).send(`No movie found with id: ${id}`);
+        } else {
+            res.json(result.rows);
+        }
+    })
+        .catch(error => {
+            console.log("An error occurred while gitting the movie data.", error);
+        })
+});
+
 // Error handler for server errors (status 500)
 app.use((req, res) => {
     res.status(500).json({ stutus: 500, responseText: "Sorry, something went wrong." });
