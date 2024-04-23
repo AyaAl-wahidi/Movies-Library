@@ -3,8 +3,9 @@
 **Author Name**: Aya Al-wahidi
 
 ## WRRC
-![Web Request Response Cycle1](/WRRC.jpg)
-![Web Request Response Cycle2](/WRRC2.jpg)
+![Web Request Response Cycle1](./Images/WRRC.jpg)
+![Web Request Response Cycle2](./Images/WRRC2.jpg)
+![Web Request Response Cycle13](./Images/WRRC3.jpg)
 
 
 ## Overview
