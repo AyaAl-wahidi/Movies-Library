@@ -3,7 +3,9 @@
 **Author Name**: Aya Al-wahidi
 
 ## WRRC
-![Web Request Response Cycle](/WRRC.jpg)
+![Web Request Response Cycle1](/WRRC.jpg)
+![Web Request Response Cycle2](/WRRC2.jpg)
+
 
 ## Overview
 The Movies app is a web server that serves data related to the latest movies and their details, as well as providing access to a favorite page. It allows users to fetch movie data using different endpoints and provides an error handling mechanism for a better user experience.

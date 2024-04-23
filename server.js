@@ -3,13 +3,26 @@
 require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3002;
 const API_KEY = process.env.API_KEY;
 const app = express();
+const bodyParser = require('body-parser')
 const data = require("./MovieData/data.json");
 
+//bodyParser json part
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
+const { Client } = require('pg')
+const url = 'postgres://aya:0000@localhost:5432/demo'
+const client = new Client(url)
+
 // To connect the server
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+client.connect()
+    .then(() => {
+        app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+    })
+    .catch();
 
 function DataFormat(Message) {
     this.Message = Message;
@@ -101,6 +114,36 @@ app.get('/favorite', (req, res) => {
 app.get('/', (req, res) => {
     const resData = new Movie(data.title, data.poster_path, data.overview);
     res.json(resData);
+});
+
+// Rout to add new Movie
+app.post('/addMovie', (req, res) => {
+    console.log(req.body);
+    const { id, title, overview, release_date, poster_path, comment } = req.body;
+
+    const sql = 'INSERT INTO movie (id, title, overview, release_date, poster_path, comment) VALUES($1, $2, $3, $4, $5, $6) RETURNING *;'
+    const values = [id, title, overview, release_date, poster_path, comment];
+    client.query(sql, values).then((result) => {
+        console.log(result.rows);
+        res.status(201).json(result.rows);
+    })
+        .catch(error => {
+            console.log(error);
+        })
+});
+
+// Rout to get all the Movies
+app.get('/getMovies', (req, res) => {
+    const sql = 'SELECT * FROM movie;'
+
+    client.query(sql)
+        .then((result) => {
+            const data = result.rows;
+            res.json(data);
+        })
+        .catch(error => {
+            console.log(error);
+        })
 });
 
 // Error handler for server errors (status 500)
