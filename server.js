@@ -3,7 +3,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3004;
 const API_KEY = process.env.API_KEY;
 const app = express();
 const bodyParser = require('body-parser')
