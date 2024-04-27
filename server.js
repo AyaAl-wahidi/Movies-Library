@@ -3,7 +3,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3004;
 const API_KEY = process.env.API_KEY;
 const app = express();
 const bodyParser = require('body-parser')
@@ -13,9 +13,10 @@ const data = require("./MovieData/data.json");
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-const { Client } = require('pg')
-const url = 'postgres://aya:0000@localhost:5432/demo'
-const client = new Client(url)
+const { Client } = require('pg');
+// const url = 'postgres://aya:0000@localhost:5432/demo';
+const url = 'postgres://feopbypv:s1o738imrXWDMI_Q7liE6m5ehmvRoavW@lallah.db.elephantsql.com/feopbypv';
+const client = new Client(url);
 
 // To connect the server
 client.connect()
@@ -60,7 +61,7 @@ app.get('/trending', (req, res) => {
 // Rout to search on specific movie
 app.get('/search', (req, res) => {
     let searchMovieName = req.query.title;
-    const url = `https://api.themoviedb.org/3/search/movie?query=${searchMovieName}&api_key=${API_KEY}&language=en-US`;
+    const url = `https://api.themoviedb.org/3/search/movie?query=${searchMovieName}&api_key=${API_KEY}&language=en-US&page=1`;
     axios.get(url)
         .then(result => {
             let movieData = result.data.results.map(key => {
@@ -119,10 +120,10 @@ app.get('/', (req, res) => {
 // Rout to add new Movie
 app.post('/addMovie', (req, res) => {
     console.log(req.body);
-    const { id, title, overview, release_date, poster_path, comment } = req.body;
+    const { title, overview, release_date, poster_path, comment } = req.body;
 
-    const sql = 'INSERT INTO movie (id, title, overview, release_date, poster_path, comment) VALUES($1, $2, $3, $4, $5, $6) RETURNING *;'
-    const values = [id, title, overview, release_date, poster_path, comment];
+    const sql = 'INSERT INTO movie ( title, overview, release_date, poster_path, comment) VALUES($1, $2, $3, $4, $5) RETURNING *;'
+    const values = [title, overview, release_date, poster_path, comment];
     client.query(sql, values).then((result) => {
         console.log(result.rows);
         res.status(201).json(result.rows);
@@ -150,16 +151,17 @@ app.get('/getMovies', (req, res) => {
 app.put('/editMovieById/:id', (req, res) => {
 
     let editData = req.params.id;
-    let { id, title, overview, release_date, poster_path, comment } = req.body;
-    const sql = 'UPDATE movie SET id = $1, title = $2, overview = $3, release_date = $4, poster_path = $5, comment = $6 WHERE id = $1;'
-    const values = [id, title, overview, release_date, poster_path, comment];
+    let { title, overview, release_date, poster_path, comment } = req.body;
+    const sql = `UPDATE movie SET title = $1, overview = $2, release_date = $3, poster_path = $4, comment = $5 WHERE id = ${editData};`
+    const values = [title, overview, release_date, poster_path, comment];
     client.query(sql, values).then((result) => {
         if (result.rowCount === 0) {
             // No row was deleted, send a different response
             res.status(404).send(`No movie found with id: ${id}`);
         } else {
             // A row was deleted, send a success response
-            res.send("Successfully edited");        }
+            res.send("Successfully edited");
+        }
     })
         .catch(error => {
             console.log("An error occurred while deleting the movie.", error);
@@ -169,7 +171,7 @@ app.put('/editMovieById/:id', (req, res) => {
 // Rout to delete a record data based by id from movies list
 app.delete('/deleteMovieById/:id', (req, res) => {
 
-    let {id} = req.params;
+    let { id } = req.params;
     const sql = 'DELETE FROM movie WHERE id = $1;'
     const values = [id];
     client.query(sql, values).then((result) => {
