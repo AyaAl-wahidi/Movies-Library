@@ -1,6 +1,8 @@
 'use strict'
 
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
 const axios = require('axios');
 const express = require('express');
 const PORT = process.env.PORT || 3004;
@@ -12,6 +14,7 @@ const data = require("./MovieData/data.json");
 //bodyParser json part
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(cors());
 
 const { Client } = require('pg');
 // const url = 'postgres://aya:0000@localhost:5432/demo';
